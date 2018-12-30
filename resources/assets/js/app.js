@@ -26,7 +26,16 @@ const app = new Vue({
     chat: {
       message: [],
       user: [],
-      color: []
+      color: [],
+      time: []
+    },
+    typing: ""
+  },
+  watch: {
+    message() {
+      Echo.private("chat").whisper("typing", {
+        name: this.message
+      });
     }
   },
   methods: {
@@ -36,6 +45,7 @@ const app = new Vue({
         this.chat.message.push(this.message);
         this.chat.color.push("success");
         this.chat.user.push("you");
+        this.chat.time.push(this.getTime());
 
         axios
           .post("/send", {
@@ -49,14 +59,30 @@ const app = new Vue({
             console.log(error);
           });
       }
+    },
+    getTime() {
+      let time = new Date();
+      return time.getHours() + ":" + time.getMinutes();
     }
   },
   mounted() {
-    Echo.private("chat").listen("ChatEvent", e => {
-      this.chat.message.push(e.message);
-      this.chat.user.push(e.user);
-      this.chat.color.push("warning");
-      // console.log(e);
-    });
+    Echo.private("chat")
+      .listen("ChatEvent", e => {
+        this.chat.message.push(e.message);
+        this.chat.user.push(e.user);
+        this.chat.color.push("warning");
+        this.chat.time.push(this.getTime());
+        // console.log(e);
+      })
+      // Echo.channel('chat')
+      .listenForWhisper("typing", e => {
+        if (e.name != "") {
+          // console.log("typing");
+          this.typing = "typing...";
+        } else {
+          // console.log("");
+          this.typing = "";
+        }
+      });
   }
 });
