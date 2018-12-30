@@ -21,13 +21,14 @@
                 <li class="list-group-item active">Chat Room</li>
                 <ul class="list-group" v-chat-scroll>
                     <message 
-                    v-for="value in chat.message"
+                    v-for="value,index in chat.message"
                     :key=value.index
-                    color='success'>
+                    :color=chat.color[index]
+                    :user=chat.user[index]>
                         @{{ value }}
                     </message>
                 </ul>
-                <input type="text" name="" id="" class="form-control" placeholder="Type your message here .." v-model='message' @keyup.enter='send'>
+                <input type="text" class="form-control" placeholder="Type your message here .." v-model='message' @keyup.enter='send'>
             </div>
 
         </div>
