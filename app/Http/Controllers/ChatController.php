@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use session;
 use App\User;
 use App\Events\ChatEvent;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class ChatController extends Controller
     {
         // return $request->all();
         $user = User::find(Auth::id());
+        $this->saveToSession($request);
         event(new ChatEvent($request->message, $user));
     }
 
@@ -37,4 +39,19 @@ class ChatController extends Controller
     //     $user = User::find(Auth::id());
     //     event(new ChatEvent($message, $user));
     // }
+
+    public function saveToSession(Request $request)
+    {
+        session()->put('chat', $request->chat);
+    }
+
+    public function getOldMessage()
+    {
+        return session('chat');
+    }
+
+    public function deleteSession()
+    {
+        session()->forget('chat');
+    }
 }
